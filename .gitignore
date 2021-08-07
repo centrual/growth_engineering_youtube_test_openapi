@@ -1,2 +1,5 @@
 .idea/
+php_laravel_server/
+
 .npmrc
+openapitools.json

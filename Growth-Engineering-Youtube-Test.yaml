@@ -15,8 +15,253 @@ servers:
     description: Local
   - url: 'https://geyt.ml'
     description: Production
-paths: {}
+paths:
+  '/playlist/{playlist_id}':
+    parameters:
+      - schema:
+          type: string
+          example: UUTI5S0PqpgB0DbYgcgRU6QQ
+          pattern: '^[a-zA-Z0-9]+$'
+          minLength: 16
+          maxLength: 36
+        name: playlist_id
+        in: path
+        required: true
+        description: Id of playlist
+    get:
+      summary: Get - List Playlist
+      tags:
+        - Youtube
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPlaylistResponse'
+        '403':
+          $ref: '#/components/responses/QuotaExceededError'
+      operationId: get-playlist
+      description: List playlist
+      x-internal: false
+      parameters:
+        - schema:
+            type: string
+            example: CAUQAA
+            pattern: '^[a-zA-Z0-9]+$'
+            minLength: 4
+            maxLength: 10
+          in: query
+          name: last_video_id
+          description: Next page token
 components:
-  schemas: {}
+  schemas:
+    PlaylistItem:
+      title: GetPlaylistItem
+      type: object
+      properties:
+        kind:
+          type: string
+        etag:
+          type: string
+        id:
+          type: string
+        snippet:
+          $ref: '#/components/schemas/PlaylistItemSnippet'
+        status:
+          $ref: '#/components/schemas/PlaylistItemStatus'
+        contentDetails:
+          $ref: '#/components/schemas/PlaylistItemContentDetails'
+      required:
+        - kind
+        - etag
+        - id
+        - snippet
+        - status
+        - contentDetails
+    PageInfo:
+      title: PlaylistInfo
+      type: object
+      properties:
+        totalResults:
+          type: integer
+        resultsPerPage:
+          type: integer
+      required:
+        - totalResults
+        - resultsPerPage
+    PlaylistItemStatus:
+      title: PlaylistItemStatus
+      type: object
+      properties:
+        privacyStatus:
+          type: string
+      required:
+        - privacyStatus
+      description: Playlist Item Status
+    PlaylistItemContentDetails:
+      title: PlaylistItemContentDetails
+      type: object
+      properties:
+        videoId:
+          type: string
+        videoPublishedAt:
+          type: string
+      required:
+        - videoId
+        - videoPublishedAt
+      description: Playlist Item Content Details
+    PlaylistItemThumbnail:
+      title: PlaylistItemThumbnail
+      type: object
+      properties:
+        url:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+      required:
+        - url
+        - width
+        - height
+      description: Playlist Item Thumbnail
+    PlaylistItemThumbnails:
+      title: PlaylistItemThumbnails
+      type: object
+      description: Playlist Item Thumbnails
+      properties:
+        default:
+          $ref: '#/components/schemas/PlaylistItemThumbnail'
+        medium:
+          $ref: '#/components/schemas/PlaylistItemThumbnail'
+        high:
+          $ref: '#/components/schemas/PlaylistItemThumbnail'
+        standard:
+          $ref: '#/components/schemas/PlaylistItemThumbnail'
+        maxres:
+          $ref: '#/components/schemas/PlaylistItemThumbnail'
+      required:
+        - default
+        - medium
+        - high
+        - standard
+        - maxres
+    PlaylistItemSnippet:
+      title: PlaylistItemSnippet
+      type: object
+      description: Playlist Item Snippet
+      properties:
+        publishedAt:
+          type: string
+        channelId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        thumbnails:
+          $ref: '#/components/schemas/PlaylistItemThumbnails'
+        channelTitle:
+          type: string
+        playlistId:
+          type: string
+        position:
+          type: integer
+        videoOwnerChannelTitle:
+          type: string
+        videoOwnerChannelId:
+          type: string
+        resourceId:
+          $ref: '#/components/schemas/PlaylistItemResourceId'
+      required:
+        - publishedAt
+        - channelId
+        - title
+        - description
+        - thumbnails
+        - channelTitle
+        - playlistId
+        - position
+        - videoOwnerChannelTitle
+        - videoOwnerChannelId
+        - resourceId
+    PlaylistItemResourceId:
+      title: PlaylistItemResourceId
+      type: object
+      properties:
+        kind:
+          type: string
+        videoId:
+          type: string
+      required:
+        - kind
+        - videoId
+      description: Playlist Item Resource Id
+    ErrorItem:
+      title: ErrorItem
+      type: object
+      description: Error Item
+      properties:
+        domain:
+          type: string
+        reason:
+          type: string
+        message:
+          type: string
+        locationType:
+          type: string
+        location:
+          type: string
+      required:
+        - message
+    Error:
+      title: Error
+      type: object
+      description: Error
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      required:
+        - code
+        - message
+  responses:
+    GetPlaylistResponse:
+      description: Get playlist response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              kind:
+                type: string
+              etag:
+                type: string
+              nextPageToken:
+                type: string
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlaylistItem'
+              pageInfo:
+                $ref: '#/components/schemas/PageInfo'
+            required:
+              - kind
+              - etag
+              - nextPageToken
+              - items
+    QuotaExceededError:
+      description: Quota Exceeded Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+            required:
+              - error
 tags:
   - name: Youtube

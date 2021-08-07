@@ -1,0 +1,78 @@
+name: "Deploy API Client Package"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 14
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 12
+
+      - name: Use .npmrc
+        uses: bduff9/use-npmrc@v1.1
+        with:
+          dot-npmrc: ${{ secrets.DOT_NPMRC }}
+
+      - name: Publish Mobile Api Client
+        run: |
+          OPEN_API_FILE_PATH="$GITHUB_WORKSPACE/Growth-Engineering-Youtube-Test.yaml"
+          OPEN_API_GENERATE_CONFIG="$GITHUB_WORKSPACE/api_client.config.json"
+          OPEN_API_GENERATE_DIRECTORY="./geyt_api_client"
+          OPEN_API_PACKAGE_NAME="@centrual/geyt_api_client"
+          ls
+          mkdir check
+          cd check
+          npm init -y
+          cp "$GITHUB_WORKSPACE/.npmrc" ./.npmrc
+          npm i -D "$OPEN_API_PACKAGE_NAME" || true
+          if [ -d "./node_modules/$OPEN_API_PACKAGE_NAME" ]
+          then
+          cd "node_modules/$OPEN_API_PACKAGE_NAME"
+          LAST_RELEASED_PACKAGE_VERSION=$(cat "./package.json" | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[" ]//g')
+          else
+          LAST_RELEASED_PACKAGE_VERSION=""
+          fi
+          PACKAGE_VERSION=$(cat "$OPEN_API_FILE_PATH" | grep version | head -1 | awk -F: '{ print $2 }' | sed "s/[' ]//g")
+          echo "LAST_RELEASED_PACKAGE_VERSION: $LAST_RELEASED_PACKAGE_VERSION"
+          echo "PACKAGE_VERSION: $PACKAGE_VERSION"
+          if [ "$LAST_RELEASED_PACKAGE_VERSION" != "$PACKAGE_VERSION" ]
+          then
+          cd "$GITHUB_WORKSPACE"
+          ls
+          npm install @openapitools/openapi-generator-cli -g
+          npx openapi-generator-cli generate -i "$OPEN_API_FILE_PATH" -g typescript-axios -c "$OPEN_API_GENERATE_CONFIG" -o "$OPEN_API_GENERATE_DIRECTORY"
+          cd "$OPEN_API_GENERATE_DIRECTORY"
+          ls
+          sed -i 's/OpenAPI\-Generator Contributors/Oğuz Özcan <hello@oguzozcan\.com>/' package.json
+          sed -i 's/    "prepublishOnly": "npm run build"//' package.json
+          sed -i 's/outDir dist\/",/outDir dist\/"/' package.json
+          sed -i "s/1\.0\.0/$PACKAGE_VERSION/" package.json
+          sed -i 's/\.\/dist\/index\.js/\.\/index\.js/' package.json
+          sed -i 's/\.\/dist\/index\.d\.ts/\.\/index\.d\.ts/' package.json
+          sed -i '0,/{/s//{\n  "repository": "https:\/\/github\.com\/centrual\/growth_engineering_youtube_test_openapi\.git",/' package.json
+          npm i axios@latest
+          npm i -D @types/node@latest typescript@latest
+          npm run build || true
+          cp package.json ./dist/package.json
+          cp README.md ./dist/README.md
+          cp "$GITHUB_WORKSPACE/.npmrc" ./dist/.npmrc
+          cd dist
+          npm publish
+          else
+          echo "Already up to date"
+          fi

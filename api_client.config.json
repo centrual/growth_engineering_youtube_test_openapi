@@ -1,0 +1,12 @@
+{
+  "supportsES6": true,
+  "enumPropertyNaming": "UPPERCASE",
+  "prependFormOrBodyParameters": true,
+  "withInterfaces": true,
+  "withSeparateModelsAndApi": true,
+  "apiPackage": "api",
+  "modelPackage": "models",
+  "npmName": "@centrual/geyt_api_client",
+  "npmVersion": "1.0.0",
+  "withoutPrefixEnums": true
+}

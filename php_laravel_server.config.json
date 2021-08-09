@@ -1,0 +1,8 @@
+{
+  "packageName": "GrowthEngineering",
+  "apiPackage": "api",
+  "modelPackage": "models",
+  "artifactVersion": "1.0.0",
+  "disallowAdditionalPropertiesIfNotPresent": true,
+  "invokerPackage": "GrowthEngineering\\YoutubeTestServer"
+}

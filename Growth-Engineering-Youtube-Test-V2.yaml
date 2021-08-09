@@ -90,7 +90,9 @@ components:
         playlistInfo:
           $ref: '#/components/schemas/PlaylistInfo'
         videoInfo:
-          $ref: '#/components/schemas/VideoInfo'
+          type: array
+          items:
+            $ref: '#/components/schemas/VideoInfo'
       required:
         - playlistInfo
         - videoInfo

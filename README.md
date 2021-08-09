@@ -18,8 +18,17 @@ Because the API key sharing is insecure I split the project into 3 parts. This p
 
 ---
 
+## Generating Laravel Server
 
-## Getting started
+To generate server package with `php-laravel` template you can use the following command in CLI:
+
+```
+npx openapi-generator-cli generate -i Growth-Engineering-Youtube-Test-V2.yaml -g php-laravel -c php_laravel_server.config.json -o php_laravel_server
+```
+
+---
+
+## Package Installation
 
 Firstly please create a new token [from this page](https://github.com/settings/tokens/new). Only `read:packages` scope is enough to install the rest client package.
 

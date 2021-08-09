@@ -30,7 +30,7 @@ jobs:
 
       - name: Publish Mobile Api Client
         run: |
-          OPEN_API_FILE_PATH="$GITHUB_WORKSPACE/Growth-Engineering-Youtube-Test.yaml"
+          OPEN_API_FILE_PATH="$GITHUB_WORKSPACE/Growth-Engineering-Youtube-Test-V2.yaml"
           OPEN_API_GENERATE_CONFIG="$GITHUB_WORKSPACE/api_client.config.json"
           OPEN_API_GENERATE_DIRECTORY="./geyt_api_client"
           OPEN_API_PACKAGE_NAME="@centrual/geyt_api_client"

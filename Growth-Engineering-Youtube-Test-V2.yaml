@@ -1,0 +1,251 @@
+openapi: 3.1.0
+info:
+  title: Growth Engineering Youtube Test
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    identifier: Apache-2.0
+  description: OpenAPI declarations for Growth Engineering youtube test
+  summary: OpenAPI declarations for Growth Engineering youtube test
+  contact:
+    name: Oğuz Özcan
+    email: hello@oguzozcan.com
+servers:
+  - url: 'https://localhost:5001'
+    description: Local
+  - url: 'https://geyt.ml'
+    description: Production
+paths:
+  '/playlist/{playlist_id}':
+    parameters:
+      - schema:
+          type: string
+          example: UUTI5S0PqpgB0DbYgcgRU6QQ
+          pattern: '^[a-zA-Z0-9]+$'
+          minLength: 16
+          maxLength: 36
+        name: playlist_id
+        in: path
+        required: true
+        description: Id of playlist
+    get:
+      summary: Get - List Playlist
+      tags:
+        - Youtube
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPlaylistResponse'
+        '403':
+          $ref: '#/components/responses/QuotaExceededError'
+      operationId: get-playlist
+      description: List playlist
+      x-internal: false
+      parameters:
+        - schema:
+            type: string
+            example: CAUQAA
+            pattern: '^[a-zA-Z0-9]+$'
+            minLength: 4
+            maxLength: 10
+          in: query
+          name: last_video_id
+          description: Next page token
+components:
+  schemas:
+    ErrorItem:
+      title: ErrorItem
+      type: object
+      description: Error Item
+      properties:
+        domain:
+          type: string
+        reason:
+          type: string
+        message:
+          type: string
+        locationType:
+          type: string
+        location:
+          type: string
+      required:
+        - message
+    Error:
+      title: Error
+      type: object
+      description: Error
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      required:
+        - code
+        - message
+    PlaylistResponse:
+      title: Playlist Response
+      type: object
+      properties:
+        playlistInfo:
+          $ref: '#/components/schemas/PlaylistInfo'
+        videoInfo:
+          $ref: '#/components/schemas/VideoInfo'
+      required:
+        - playlistInfo
+        - videoInfo
+    PlaylistInfo:
+      description: ''
+      type: object
+      x-examples:
+        example-1:
+          totalRecords: 144
+          resultsPerPage: 20
+          prevPageToken: abcdef
+          nextPageToken: abcdef
+      properties:
+        totalRecords:
+          type: number
+        resultsPerPage:
+          type: number
+        prevPageToken:
+          type: string
+        nextPageToken:
+          type: string
+      required:
+        - totalRecords
+        - resultsPerPage
+      title: Playlist Info
+    VideoInfo:
+      description: ''
+      type: object
+      x-examples:
+        example-1:
+          videoId: abcdef
+          viewCount: 123321
+          likeCount: 21213
+          dislikeCount: 212332
+          publishedAt: '2021-02-09T11:04:08Z'
+          channelId: UCTI5S0PqpgB0DbYgcgRU6QQ
+          title: 'The Academy LMS: Impact Fuelled by Learner Engagement!'
+          description: |-
+            Improve your team’s performance by as much as 75% year-on-year, with a learning management system that uses the power of engagement, behavioural science and learning best practice to drive results.
+
+            www.growthengineering.co.uk
+      title: Video Info
+      properties:
+        videoId:
+          type: string
+          minLength: 1
+        viewCount:
+          type: number
+        likeCount:
+          type: number
+        dislikeCount:
+          type: number
+        publishedAt:
+          type: string
+          minLength: 1
+        channelId:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        thumbnails:
+          $ref: '#/components/schemas/VideoThumbnails'
+      required:
+        - videoId
+        - viewCount
+        - likeCount
+        - dislikeCount
+        - publishedAt
+        - channelId
+        - title
+        - description
+        - thumbnails
+    VideoThumbnails:
+      description: ''
+      type: object
+      x-examples:
+        example-1:
+          default:
+            url: ''
+            width: 1
+            height: 1
+          medium:
+            url: ''
+            width: 1
+            height: 1
+          high:
+            url: ''
+            width: 1
+            height: 1
+          standard:
+            url: ''
+            width: 1
+            height: 1
+          maxres:
+            url: ''
+            width: 1
+            height: 1
+      properties:
+        default:
+          $ref: '#/components/schemas/VideoThumbnail'
+        medium:
+          $ref: '#/components/schemas/VideoThumbnail'
+        high:
+          $ref: '#/components/schemas/VideoThumbnail'
+        standard:
+          $ref: '#/components/schemas/VideoThumbnail'
+        maxres:
+          $ref: '#/components/schemas/VideoThumbnail'
+      required:
+        - default
+        - maxres
+      title: Video Thumbnails
+    VideoThumbnail:
+      description: ''
+      type: object
+      properties:
+        url:
+          type: string
+        width:
+          type: number
+        height:
+          type: number
+      required:
+        - url
+        - width
+        - height
+      x-examples:
+        example-1:
+          url: ''
+          width: 1
+          height: 1
+      title: Video Thumbnail
+  responses:
+    GetPlaylistResponse:
+      description: Get playlist response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlaylistResponse'
+    QuotaExceededError:
+      description: Quota Exceeded Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+            required:
+              - error
+tags:
+  - name: Youtube
